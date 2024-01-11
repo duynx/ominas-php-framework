@@ -14,3 +14,10 @@ VALUES ('Product One', 'This is product one'),
        ('Second Product', 'A second product here'),
        ('Product #3', ''),
        ('The 4th One', 'Some <b>HTML</b> in the description');
+/**
+  $dsn = "mysql:host=localhost;dbname=ominas;charset=utf8;port=3306";
+
+$pdo = new PDO($dsn, "ominas_dbuser", "secret", [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+]);
+ */
