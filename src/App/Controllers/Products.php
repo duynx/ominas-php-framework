@@ -11,15 +11,23 @@ class Products
         $products = $model->getData();
 
         $viewer = new Viewer;
-        echo $viewer->render("products_index.php", [
+        echo $viewer->render("Layout/header.php", [
+            "title" => "Product List"
+        ]);
+        echo $viewer->render("Products/index.php", [
             "products" => $products
         ]);
     }
 
     public function show(string $id)
     {
-        var_dump($id);
-        require "views/products_show.php";
+        $viewer = new Viewer;
+        echo $viewer->render("Layout/header.php", [
+            "title" => "Product Detail"
+        ]);
+        echo $viewer->render("Products/show.php", [
+            "id" => $id
+        ]);
     }
 
     public function showPage(string $title, string $id, string $page)
