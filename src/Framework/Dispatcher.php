@@ -1,5 +1,6 @@
 <?php
 namespace Framework;
+use ReflectionClass;
 use ReflectionMethod;
 
 class Dispatcher
@@ -17,7 +18,21 @@ class Dispatcher
         $action = $this->getActionName($params);
         $controller = $this->getControllerName($params);
 
-        $controller_object = new $controller(new Viewer);
+        // Use reflector to get params of Controller constructor, that we need to provide while instanciates the Controller.
+        // Because we don't know how many params and what exactly we have to provide here.
+        $reflector = new ReflectionClass($controller);
+        $constructor = $reflector->getConstructor();
+        $dependencies = [];
+        if($constructor !== null) {
+            foreach ($constructor->getParameters() as $param) {
+                $type = (string) $param->getType();
+                $dependencies[] = new $type;
+            }
+        }
+
+        // Auto wiring
+        // Creating any dependencies automatically based on the type declarations in the controller
+        $controller_object = new $controller(...$dependencies); // unpack array of dependencies instead of give specific params
         $args = $this->getActionArguments($controller, $action, $params);;
         $controller_object->$action(...$args);
     }

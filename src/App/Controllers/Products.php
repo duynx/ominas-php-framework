@@ -5,13 +5,12 @@ use Framework\Viewer;
 
 class Products
 {
-    public function __construct(private Viewer $viewer)
+    public function __construct(private Viewer $viewer, private Product $model)
     {
     }
     public function index()
     {
-        $model = new Product;
-        $products = $model->getData();
+        $products = $this->model->getData();
 
         echo $this->viewer->render("Layout/header.php", [
             "title" => "Product List"
