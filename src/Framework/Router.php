@@ -1,7 +1,8 @@
 <?php
 namespace Framework;
 
-class Router {
+class Router
+{
     private array $routes = [];
 
     public function add(string $path, array $params = []): void
