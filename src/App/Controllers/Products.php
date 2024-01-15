@@ -5,16 +5,18 @@ use Framework\Viewer;
 
 class Products
 {
+    public function __construct(private Viewer $viewer)
+    {
+    }
     public function index()
     {
         $model = new Product;
         $products = $model->getData();
 
-        $viewer = new Viewer;
-        echo $viewer->render("Layout/header.php", [
+        echo $this->viewer->render("Layout/header.php", [
             "title" => "Product List"
         ]);
-        echo $viewer->render("Products/index.php", [
+        echo $this->viewer->render("Products/index.php", [
             "products" => $products
         ]);
     }
@@ -22,10 +24,10 @@ class Products
     public function show(string $id)
     {
         $viewer = new Viewer;
-        echo $viewer->render("Layout/header.php", [
+        echo $this->viewer->render("Layout/header.php", [
             "title" => "Product Detail"
         ]);
-        echo $viewer->render("Products/show.php", [
+        echo $this->viewer->render("Products/show.php", [
             "id" => $id
         ]);
     }
