@@ -1,11 +1,21 @@
 <?php
 declare(strict_types=1);
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+$showError = false;
+if($showError) {
+    ini_set('display_errors', '1');
+}else{
+    ini_set('display_errors', '0');
+    ini_set("log_errors", "1");
+    require "views/500.php";
+}
 
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+if($path === false) {
+    throw new UnexpectedValueException("Malformed URL: '{$_SERVER["REQUEST_URI"]}'");
+}
+
 spl_autoload_register(function (string $class_name) {
     require "src/" . str_replace("\\", "/", $class_name) . ".php";
 });
