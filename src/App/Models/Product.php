@@ -1,19 +1,15 @@
 <?php
 namespace App\Models;
 use PDO;
+use App\Database;
 
 class Product
 {
+    public function __construct(private Database $database) {}
+
     public function getData(): array
     {
-        $dsn = "mysql:host=localhost;dbname=ominas;charset=utf8;port=3306";
-
-        $pdo = new PDO($dsn, "ominas_dbuser", "secret", [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]);
-
-        $stmt = $pdo->query("SELECT * FROM product");
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $pdo = $this->database->getConnection();
+        return $pdo->query("SELECT * FROM product")->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -18,23 +18,10 @@ class Dispatcher
         $action = $this->getActionName($params);
         $controller = $this->getControllerName($params);
 
-        // Use reflector to get params of Controller constructor, that we need to provide while instanciates the Controller.
-        // Because we don't know how many params and what exactly we have to provide here.
-        $reflector = new ReflectionClass($controller);
-        $constructor = $reflector->getConstructor();
-        $dependencies = [];
-        if($constructor !== null) {
-            foreach ($constructor->getParameters() as $param) {
-                $type = (string) $param->getType();
-                $dependencies[] = new $type;
-            }
-        }
+        $controllerObject = $this->getObject($controller);
 
-        // Auto wiring
-        // Creating any dependencies automatically based on the type declarations in the controller
-        $controller_object = new $controller(...$dependencies); // unpack array of dependencies instead of give specific params
         $args = $this->getActionArguments($controller, $action, $params);;
-        $controller_object->$action(...$args);
+        $controllerObject->$action(...$args);
     }
 
     private function getActionArguments(string $controller, string $action, array $params): array
@@ -67,5 +54,28 @@ class Dispatcher
     {
         $action = $params["action"];
         return lcfirst(str_replace("-","", ucwords(strtolower($action),"-")));
+    }
+
+    private function getObject(string $className): object
+    {
+        // Use reflector to get params of Controller constructor, that we need to provide while instanciates the Controller.
+        // Because we don't know how many params and what exactly we have to provide here.
+        $reflector = new ReflectionClass($className);
+        $constructor = $reflector->getConstructor();
+        $dependencies = [];
+
+        if($constructor === null) {
+            return new $className;
+        }
+
+        foreach ($constructor->getParameters() as $param) {
+            $type = (string) $param->getType();
+            $dependencies[] = $this->getObject($type);
+        }
+
+
+        // Auto wiring
+        // Creating any dependencies automatically based on the type declarations in the controller
+        return new $className(...$dependencies); // unpack array of dependencies instead of give specific params
     }
 }
