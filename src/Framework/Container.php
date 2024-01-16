@@ -1,12 +1,19 @@
 <?php
 namespace Framework;
+use Closure;
 use ReflectionClass;
 
 class Container
 {
     private array $registry = [];
 
-    public function set(string $name, $value): void
+    /**
+     * @param string $name
+     * @param Closure $value
+     * * Closure is the class used to represent anonymous functions
+     * @return void
+     */
+    public function set(string $name, Closure $value): void
     {
         $this->registry[$name] = $value;
     }
@@ -14,7 +21,7 @@ class Container
     public function get(string $className): object
     {
         if(array_key_exists($className, $this->registry)) {
-            return $this->registry[$className];
+            return $this->registry[$className]();
         }
 
         // Use reflector to get params of Controller constructor, that we need to provide while instanciates the Controller.

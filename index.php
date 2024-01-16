@@ -21,9 +21,10 @@ $router->add("/{controller}/{action}");
 
 $container = new Framework\Container;
 
-$database = new \App\Database("localhost","ominas","ominas_dbuser","secret");
 // We are binding a value for the database class to the service container
-$container->set(\App\Database::class,$database);
+$container->set(\App\Database::class,function (){
+    return new \App\Database("localhost","ominas","ominas_dbuser","secret");
+});
 
 $dispatcher = new Framework\Dispatcher($router, $container);
 $dispatcher->handle($path);
