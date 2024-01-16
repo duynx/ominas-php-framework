@@ -28,13 +28,10 @@ class ErrorHandler
             $template = "500.php";
         }
 
-        $showError = true;
-
-        if($showError) {
+        if($_ENV["SHOW_ERRORS"]) {
             ini_set('display_errors', '1');
         }else{
             ini_set('display_errors', '0');
-            ini_set("log_errors", "1");
             require "views/$template";
         }
         throw $exception;
