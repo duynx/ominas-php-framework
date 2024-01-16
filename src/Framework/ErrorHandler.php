@@ -22,7 +22,7 @@ class ErrorHandler
     {
         if($exception instanceof PageNotFoundException) {
             http_response_code(404);
-            $template = "400.php";
+            $template = "404.php";
         }else {
             http_response_code(500);
             $template = "500.php";
@@ -32,7 +32,7 @@ class ErrorHandler
             ini_set('display_errors', '1');
         }else{
             ini_set('display_errors', '0');
-            require "views/$template";
+            require dirname(__DIR__, 2) . "/views/$template";
         }
         throw $exception;
     }
