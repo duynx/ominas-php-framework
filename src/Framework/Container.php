@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Framework;
 use Closure;
 use ReflectionClass;
+use ReflectionNamedType;
 
 class Container
 {
@@ -35,8 +38,21 @@ class Container
         }
 
         foreach ($constructor->getParameters() as $param) {
-            $type = (string) $param->getType();
-            $dependencies[] = $this->get($type);
+            $type = $param->getType();
+
+            if($type === null) {
+                exit("Constructor parameter '{$param->getName()}' in the $className class has no type declaration");
+            }
+
+            if(!($type instanceof ReflectionNamedType)) {
+                exit("Constructor parameter '{$param->getName()}' in the $className class is an invalid type: '$type' - only single named types supported");
+            }
+
+            if($type->isBuiltin()) {
+                exit("Unable to resolve constructor parameter '{$param->getName()}' of type '$type' in the $className class");
+            }
+
+            $dependencies[] = $this->get((string) $type);
         }
 
 
