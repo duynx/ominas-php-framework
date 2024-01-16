@@ -12,13 +12,22 @@ set_error_handler(function (
 });
 
 set_exception_handler(function (Throwable $exception) {
-    $showError = true;
+    if($exception instanceof Framework\Exceptions\PageNotFoundException) {
+        http_response_code(404);
+        $template = "400.php";
+    }else {
+        http_response_code(500);
+        $template = "500.php";
+    }
+
+    $showError = false;
+
     if($showError) {
         ini_set('display_errors', '1');
     }else{
         ini_set('display_errors', '0');
         ini_set("log_errors", "1");
-        require "views/500.php";
+        require "views/$template";
     }
     throw $exception;
 });
