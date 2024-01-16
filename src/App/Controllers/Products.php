@@ -7,7 +7,7 @@ use Framework\Viewer;
 
 class Products
 {
-    public function __construct(private $viewer, private Product $model)
+    public function __construct(private Viewer $viewer, private Product $model)
     {
     }
     public function index()
