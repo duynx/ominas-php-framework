@@ -2,10 +2,14 @@
 
 <a href="/products/new">New Product</a>
 
+<p>Total: <?= $total ?></p>
+
 <?php foreach ($products as $product): ?>
 
     <h2>
-        <a href="/products/<?php echo $product["id"]; ?>/show"><?= htmlspecialchars($product["name"]) ?></a>
+        <a href="/products/<?= $product["id"] ?>/show">
+            <?= htmlspecialchars($product["name"]) ?>
+        </a>
     </h2>
 
 <?php endforeach; ?>

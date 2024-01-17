@@ -11,15 +11,18 @@ class Products
     public function __construct(private Viewer $viewer, private Product $model)
     {
     }
+
     public function index()
     {
         $products = $this->model->findAll();
 
         echo $this->viewer->render("Layout/header.php", [
-            "title" => "Product List"
+            "title" => "Products"
         ]);
+
         echo $this->viewer->render("Products/index.php", [
-            "products" => $products
+            "products" => $products,
+            "total" => $this->model->getTotal()
         ]);
     }
 
@@ -136,15 +139,6 @@ class Products
     {
         $product = $this->getProduct($id);
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-            $this->model->delete($id);
-
-            header("Location: /products/index");
-            exit;
-
-        }
-
         echo $this->viewer->render("Layout/header.php", [
             "title" => "Delete Product"
         ]);
@@ -152,5 +146,15 @@ class Products
         echo $this->viewer->render("Products/delete.php", [
             "product" => $product
         ]);
+    }
+
+    public function destroy(string $id)
+    {
+        $product = $this->getProduct($id);
+
+        $this->model->delete($id);
+
+        header("Location: /products/index");
+        exit;
     }
 }
