@@ -2,8 +2,9 @@
 
 <?php foreach ($products as $product): ?>
 
-    <h2><?= htmlspecialchars($product["name"]) ?></h2>
-    <p><?= htmlspecialchars($product["description"]) ?></p>
+    <h2>
+        <a href="/products/<?php echo $product["id"]; ?>/show"><?= htmlspecialchars($product["name"]) ?></a>
+    </h2>
 
 <?php endforeach; ?>
 
