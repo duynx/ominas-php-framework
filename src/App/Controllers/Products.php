@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 use App\Models\Product;
-use Framework\Controller;
 use Framework\Exceptions\PageNotFoundException;
+use Framework\Controller;
 
 class Products extends Controller
 {
@@ -16,10 +16,7 @@ class Products extends Controller
     {
         $products = $this->model->findAll();
 
-        $products = $this->model->findAll();
-
         echo $this->viewer->render("Products/index.mvc.php", [
-            "title" => "Products",
             "products" => $products,
             "total" => $this->model->getTotal()
         ]);
@@ -27,35 +24,18 @@ class Products extends Controller
 
     public function show(string $id)
     {
-        $product = $this->model->find($id);
+        $product = $this->getProduct($id);
 
-        if($product === false) {
-            throw new PageNotFoundException("Product not found");
-        }
-
-        echo $this->viewer->render("Layout/header.php", [
-            "title" => "Product Detail"
-        ]);
-        echo $this->viewer->render("Products/show.php", [
+        echo $this->viewer->render("Products/show.mvc.php", [
             "product" => $product
         ]);
     }
 
     public function edit(string $id)
     {
-        $product = $this->model->find($id);
+        $product = $this->getProduct($id);
 
-        if ($product === false) {
-
-            throw new PageNotFoundException("Product not found");
-
-        }
-
-        echo $this->viewer->render("Layout/header.php", [
-            "title" => "Edit Product"
-        ]);
-
-        echo $this->viewer->render("Products/edit.php", [
+        echo $this->viewer->render("Products/edit.mvc.php", [
             "product" => $product
         ]);
     }
@@ -65,9 +45,7 @@ class Products extends Controller
         $product = $this->model->find($id);
 
         if ($product === false) {
-
             throw new PageNotFoundException("Product not found");
-
         }
 
         return $product;
@@ -80,30 +58,23 @@ class Products extends Controller
 
     public function new()
     {
-        echo $this->viewer->render("Layout/header.php", [
-            "title" => "New Product"
-        ]);
-
-        echo $this->viewer->render("Products/new.php");
+        echo $this->viewer->render("Products/new.mvc.php");
     }
 
     public function create()
     {
         $data = [
-            "name" => $_POST["name"],
-            "description" => empty($_POST["description"]) ? null : $_POST["description"]
+            "name" => $this->request->post["name"],
+            "description" => empty($this->request->post["description"]) ? null : $this->request->post["description"]
         ];
 
         if ($this->model->insert($data)) {
             header("Location: /products/{$this->model->getInsertID()}/show");
             exit;
         } else {
-            echo $this->viewer->render("Layout/header.php", [
-                "title" => "New Product"
-            ]);
-
-            echo $this->viewer->render("Products/new.php", [
-                "errors" => $this->model->getErrors()
+            echo $this->viewer->render("Products/new.mvc.php", [
+                "errors" => $this->model->getErrors(),
+                "product" => $data
             ]);
         }
     }
@@ -112,37 +83,24 @@ class Products extends Controller
     {
         $product = $this->getProduct($id);
 
-        $product["name"] = $_POST["name"];
-        $product["description"] = empty($_POST["description"]) ? null : $_POST["description"];
+        $product["name"] = $this->request->post["name"];
+        $product["description"] = empty($this->request->post["description"]) ? null : $this->request->post["description"];
 
         if ($this->model->update($id, $product)) {
-
             header("Location: /products/{$id}/show");
             exit;
-
         } else {
-
-            echo $this->viewer->render("Layout/header.php", [
-                "title" => "Edit Product"
-            ]);
-
-            echo $this->viewer->render("Products/edit.php", [
+            echo $this->viewer->render("Products/edit.mvc.php", [
                 "errors" => $this->model->getErrors(),
                 "product" => $product
             ]);
-
         }
     }
 
     public function delete(string $id)
     {
         $product = $this->getProduct($id);
-
-        echo $this->viewer->render("Layout/header.php", [
-            "title" => "Delete Product"
-        ]);
-
-        echo $this->viewer->render("Products/delete.php", [
+        echo $this->viewer->render("Products/delete.mvc.php", [
             "product" => $product
         ]);
     }
@@ -150,9 +108,7 @@ class Products extends Controller
     public function destroy(string $id)
     {
         $product = $this->getProduct($id);
-
         $this->model->delete($id);
-
         header("Location: /products/index");
         exit;
     }
