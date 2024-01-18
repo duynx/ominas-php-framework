@@ -4,28 +4,33 @@ declare(strict_types=1);
 namespace Framework;
 use ReflectionMethod;
 use Framework\Exceptions\PageNotFoundException;
+use UnexpectedValueException;
 
 class Dispatcher
 {
     public function __construct(private Router $router, private Container $container)
     {}
 
-    public function handle(string $path, string $method)
+    public function handle(Request $request): void
     {
-        $params = $this->router->match($path, $method);
+        $path = $this->getPath($request->uri);
+        $params = $this->router->match($path, $request->method);
 
-        if($params === false) {
-            throw new PageNotFoundException("No route matched for '$path' with method '$method'");
+        if ($params === false) {
+            throw new PageNotFoundException("No route matched for '$path' with method '{$request->method}'");
         }
 
         $action = $this->getActionName($params);
         $controller = $this->getControllerName($params);
 
-        $controllerObject = $this->container->get($controller);
+        $controller_object = $this->container->get($controller);
+        $controller_object->setRequest($request);
+        $controller_object->setViewer($this->container->get(Viewer::class));
+        $args = $this->getActionArguments($controller, $action, $params);
 
-        $args = $this->getActionArguments($controller, $action, $params);;
-        $controllerObject->$action(...$args);
+        $controller_object->$action(...$args);
     }
+
 
     private function getActionArguments(string $controller, string $action, array $params): array
     {
@@ -57,5 +62,14 @@ class Dispatcher
     {
         $action = $params["action"];
         return lcfirst(str_replace("-","", ucwords(strtolower($action),"-")));
+    }
+
+    private function getPath(string $uri): string
+    {
+        $path = parse_url($uri, PHP_URL_PATH);
+        if ($path === false) {
+            throw new UnexpectedValueException("Malformed URL: '$uri'");
+        }
+        return $path;
     }
 }
