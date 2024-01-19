@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-define("ROOT_PATH", dirname(__DIR__));
+require_once dirname(__DIR__, 1).'/vendor/autoload.php';
 
-spl_autoload_register(function (string $class_name) {
-    require ROOT_PATH . "/src/" . str_replace("\\", "/", $class_name) . ".php";
-});
+define("ROOT_PATH", dirname(__DIR__));
 
 $dotEnv = new Framework\DotEnv();
 $dotEnv->load(ROOT_PATH . "/.env");

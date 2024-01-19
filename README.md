@@ -1,9 +1,16 @@
 # Ominas - PHP Framework
 
-
 ## Requires
 
 - PHP 8.0
+
+## Installation
+
+
+
+## Plan
+- Use Composer for autoload
+- Doctrine ORM
 
 ## References
 
