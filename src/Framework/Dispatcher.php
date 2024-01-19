@@ -8,7 +8,7 @@ use UnexpectedValueException;
 
 class Dispatcher
 {
-    public function __construct(private Router $router, private Container $container)
+    public function __construct(private Router $router, private Container $container, private array $middlewareClasses)
     {}
 
     public function handle(Request $request): Response
@@ -34,19 +34,28 @@ class Dispatcher
             $action,
             $args);
 
-        // Chain the Middleware and the Controller Action Together
-        $middleware = $this->container->get(\App\Middleware\ChangeResponseExample::class);
-        $middleware2 = $this->container->get(\App\Middleware\ChangeRequestExample::class);
-
-        // Passing Middlewares to the Stack of Middleware
-        $middleware_handler = new MiddlewareRequestHandler(
-            [$middleware2, $middleware, clone $middleware, clone $middleware],
-            $controller_handler
-        );
+        $middleware = $this->getMiddleware($params);
+        $middleware_handler = new MiddlewareRequestHandler($middleware, $controller_handler);
 
         return $middleware_handler->handle($request);
     }
 
+    private function getMiddleware(array $params): array
+    {
+        if ( ! array_key_exists("middleware", $params)) {
+            return [];
+        }
+
+        $middleware = explode("|", $params["middleware"]);
+        array_walk($middleware, function(&$value) {
+            if ( ! array_key_exists($value, $this->middlewareClasses)) {
+                throw new UnexpectedValueException("Middleware '$value' not found in config settings");
+            }
+            $value = $this->container->get($this->middlewareClasses[$value]);
+        });
+
+        return $middleware;
+    }
 
     private function getActionArguments(string $controller, string $action, array $params): array
     {

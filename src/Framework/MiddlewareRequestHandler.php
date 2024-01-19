@@ -25,7 +25,7 @@ class MiddlewareRequestHandler implements RequestHandlerInterface
             return $this->controller_handler->handle($request);
         }
 
-        // Passed thiis object which contains the array of remaining middlewares
+        // Passed this object which contains the array of remaining middlewares
         return $middleware->process($request, $this);
     }
 }
