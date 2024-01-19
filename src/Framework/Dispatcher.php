@@ -36,10 +36,11 @@ class Dispatcher
 
         // Chain the Middleware and the Controller Action Together
         $middleware = $this->container->get(\App\Middleware\ChangeResponseExample::class);
+        $middleware2 = $this->container->get(\App\Middleware\ChangeRequestExample::class);
 
-        // Passing 3 Middleware to the Stack of Middleware
+        // Passing Middlewares to the Stack of Middleware
         $middleware_handler = new MiddlewareRequestHandler(
-            [$middleware, clone $middleware, clone $middleware],
+            [$middleware2, $middleware, clone $middleware, clone $middleware],
             $controller_handler
         );
 
